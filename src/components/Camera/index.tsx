@@ -1,6 +1,6 @@
 import { FC, useEffect, useRef } from 'react';
 
-import { Canvas, Container, FaceBox, Video } from './styles';
+import { Canvas, Container, Video } from './styles';
 
 const Camera: FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
