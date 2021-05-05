@@ -1,48 +1,78 @@
 import { FC, useEffect, useRef } from 'react';
 
-import { Canvas, Container, Video } from './styles';
+import * as blazeFace from '@tensorflow-models/blazeface';
+import * as tf from '@tensorflow/tfjs';
+import Webcam from 'react-webcam';
+
+import { Container, FaceBox } from './styles';
 
 const Camera: FC = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const webcamRef = useRef<Webcam>(null);
+  const faceBoxRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const getWebcam = async () => {
-      console.log(Object.keys(navigator));
-      const devices = await navigator?.mediaDevices?.enumerateDevices();
+  const faceDetect = async (model, video) => {
+    if (!faceBoxRef.current) {
+      return false;
+    }
 
-      if (!Array.isArray(devices)) {
-        return alert('Cam not available!');
-      }
+    const faces = await model.estimateFaces(video, false);
 
-      const videoInput = devices.find(({ kind }) => kind === 'videoinput');
+    faces.forEach((face) => {
+      const top = face.topLeft[0].toFixed(2);
+      const left = face.topLeft[1].toFixed(2);
+      const bottom = face.bottomRight[0].toFixed(2);
+      const right = face.bottomRight[1].toFixed(2);
 
-      if (!videoInput) {
-        return alert('Cam not available!');
-      }
+      const probability = face.probability[0];
 
-      const camera = await navigator.mediaDevices.getUserMedia({
-        video: {
-          deviceId: videoInput?.deviceId,
-        },
-      });
+      const width = right - left;
+      const height = bottom - top;
 
-      if (videoRef.current && camera) {
-        videoRef.current.srcObject = camera;
-      }
-    };
+      const box = document.createElement('div');
 
-    getWebcam();
-  }, [videoRef]);
+      box.style.top = `${top - height}px`;
+      box.style.left = `${left - width}px`;
+      box.style.width = `${width}px`;
+      box.style.height = `${height}px`;
+      box.innerText = probability.toFixed(2).toString();
+
+      faceBoxRef.current?.appendChild(box);
+    });
+
+    // setTimeout(() => {
+    //   if (faceBoxRef.current) {
+    //     faceBoxRef.current.innerHTML = '';
+    //   }
+    // }, 200);
+  };
 
   const handleOnPlay = async () => {
+    if (!webcamRef?.current?.video || !faceBoxRef.current) {
+      return false;
+    }
     console.log('Play');
+
+    const { video } = webcamRef.current;
+    const { videoHeight, videoWidth } = video;
+
+    const model = await blazeFace.load();
+
+    // setInterval(async () => {
+    await faceDetect(model, video);
+    // }, 200);
   };
 
   return (
     <Container>
-      <Canvas ref={canvasRef} />
-      <Video ref={videoRef} autoPlay muted onPlay={handleOnPlay} />
+      <FaceBox ref={faceBoxRef} />
+      <Webcam
+        ref={webcamRef}
+        className="webcam"
+        audio={false}
+        mirrored
+        screenshotFormat="image/jpeg"
+        onPlay={handleOnPlay}
+      />
     </Container>
   );
 };

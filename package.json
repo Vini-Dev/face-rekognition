@@ -28,6 +28,9 @@
     ]
   },
   "dependencies": {
+    "@tensorflow-models/blazeface": "^0.0.7",
+    "@tensorflow-models/facemesh": "^0.0.5",
+    "@tensorflow/tfjs": "^1.5.1",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -38,6 +41,7 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
+    "react-webcam": "^5.2.3",
     "styled-components": "^5.3.0",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1"
