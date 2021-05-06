@@ -18,14 +18,6 @@ export const FaceBox = styled.div`
   width: 100%;
   height: 100%;
 
-  border: 2px solid #ffffff;
-
-  z-index: 1;
-
-  div {
-    position: absolute;
-    border: 1px solid green;
-    color: green;
-    transform: translateX(-100%);
-  }
+  transform: scaleX(-1);
+  z-index: 10;
 `;
