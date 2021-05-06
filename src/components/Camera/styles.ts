@@ -2,10 +2,9 @@ import styled from 'styled-components';
 
 export const Container = styled.div`
   position: relative;
-  max-width: 640px;
+  display: inline-block;
 
   .webcam {
-    width: 100%;
     border-radius: 16px;
   }
 `;
