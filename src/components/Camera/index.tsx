@@ -83,7 +83,6 @@ const Camera: FC = () => {
 
     setInterval(async () => {
       context?.clearRect(0, 0, canvas.width, canvas.height);
-
       await faceDetect(model, video, canvas, context);
     }, 100);
   };
@@ -100,7 +99,7 @@ const Camera: FC = () => {
         onPlay={handleOnPlay}
         videoConstraints={{
           ...getVideoConstraints(),
-          facingMode: 'environment',
+          facingMode: 'user',
         }}
       />
     </Container>
