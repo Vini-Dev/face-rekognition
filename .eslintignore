@@ -1,2 +1,5 @@
 *.css
 *.svg
+
+src/reportWebVitals.ts
+src/setupTests.ts
