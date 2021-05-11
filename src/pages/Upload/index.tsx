@@ -121,7 +121,7 @@ const Upload: FC = () => {
     context.drawImage(img, 0, 0, img.width, img.height);
 
     const blazeFaceModel = await blazeFace.load();
-    const faces = await blazeFaceModel.estimateFaces(img);
+    const faces = await blazeFaceModel.estimateFaces(img, false, true);
 
     drawFaces(faces, context);
 

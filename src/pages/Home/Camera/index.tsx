@@ -1,8 +1,10 @@
 import { FC, useRef } from 'react';
 
 import * as blazeFace from '@tensorflow-models/blazeface';
-// import * as tf from '@tensorflow/tfjs';
+import * as cocoSsd from '@tensorflow-models/coco-ssd';
 import Webcam from 'react-webcam';
+import drawFaces from 'src/utils/drawFaces';
+import drawObjects from 'src/utils/drawObjects';
 
 import { Container, FaceBox } from './styles';
 
@@ -37,36 +39,22 @@ const Camera: FC = () => {
         };
   };
 
-  const faceDetect = async (model, video, canvas, context) => {
+  const objectRekognition = async (cocoSsdModel, video, context) => {
     if (!faceBoxRef.current) {
       return false;
     }
 
-    const faces = await model.estimateFaces(video, false);
+    const objects = await cocoSsdModel.detect(video);
+    drawObjects(objects, context);
+  };
 
-    faces.forEach((face) => {
-      const top = Math.round(face.topLeft[0]);
-      const left = Math.round(face.topLeft[1]);
-      const bottom = Math.round(face.bottomRight[0]);
-      const right = Math.round(face.bottomRight[1]);
+  const faceRekognition = async (blazeFaceModel, video, context) => {
+    if (!faceBoxRef.current) {
+      return false;
+    }
 
-      // const probability = face.probability[0];
-
-      const width = right - left;
-      const height = bottom - top;
-
-      context.beginPath();
-      context.strokeStyle = '#30D158';
-      context.lineWidth = 3;
-      context.rect(top * 1.05, left * 0.9, width, height);
-      context.stroke();
-
-      // const prob = (probability * 100).toPrecision(5).toString();
-      // const text = prob + '%';
-      // context.fillStyle = 'red';
-      // context.font = '13px sans-serif';
-      // context.fillText(text, top + 5, left + 20);
-    });
+    const faces = await blazeFaceModel.estimateFaces(video, false);
+    drawFaces(faces, context);
   };
 
   const handleOnPlay = async () => {
@@ -78,22 +66,41 @@ const Camera: FC = () => {
     const { video } = webcamRef.current;
     const { videoWidth, videoHeight } = video;
 
-    const canvas = document.createElement('canvas');
+    // Face Detection
+    const faceCanvas = document.createElement('canvas');
 
-    canvas.width = videoWidth;
-    canvas.height = videoHeight;
+    faceCanvas.width = videoWidth;
+    faceCanvas.height = videoHeight;
 
-    faceBoxRef.current?.appendChild(canvas);
+    faceBoxRef.current?.appendChild(faceCanvas);
 
-    const context = canvas.getContext('2d');
+    const faceContext = faceCanvas.getContext('2d');
 
-    const model = await blazeFace.load();
+    const blazeFaceModel = await blazeFace.load();
 
     setInterval(async () => {
       // console.log(tf.memory());
-      context?.clearRect(0, 0, canvas.width, canvas.height);
-      await faceDetect(model, video, canvas, context);
-    }, 200);
+      faceContext?.clearRect(0, 0, faceCanvas.width, faceCanvas.height);
+      await faceRekognition(blazeFaceModel, video, faceContext);
+    }, 300);
+
+    // Object Detection
+    const cocoSsdModel = await cocoSsd.load();
+
+    const objectCanvas = document.createElement('canvas');
+
+    objectCanvas.width = videoWidth;
+    objectCanvas.height = videoHeight;
+
+    faceBoxRef.current?.appendChild(objectCanvas);
+
+    const objectContext = objectCanvas.getContext('2d');
+
+    setInterval(async () => {
+      // console.log(tf.memory());
+      objectContext?.clearRect(0, 0, objectCanvas.width, objectCanvas.height);
+      await objectRekognition(cocoSsdModel, video, objectContext);
+    }, 1000);
   };
 
   return (
@@ -103,7 +110,7 @@ const Camera: FC = () => {
         ref={webcamRef}
         className="webcam"
         audio={false}
-        mirrored
+        // mirrored
         screenshotFormat="image/jpeg"
         onPlay={handleOnPlay}
         videoConstraints={{

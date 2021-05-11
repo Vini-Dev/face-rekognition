@@ -19,6 +19,12 @@ export const FaceBox = styled.div`
   width: 100%;
   height: 100%;
 
-  transform: scaleX(-1);
   z-index: 10;
+
+  canvas {
+    top: 0;
+    left: 0;
+
+    position: absolute;
+  }
 `;
