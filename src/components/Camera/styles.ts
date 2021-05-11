@@ -4,8 +4,10 @@ export const Container = styled.div`
   position: relative;
   display: inline-block;
 
-  .webcam {
-    border-radius: 16px;
+  @media (min-width: 768px) {
+    .webcam {
+      border-radius: 16px;
+    }
   }
 `;
 

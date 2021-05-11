@@ -1,6 +1,7 @@
 import { FC, useRef } from 'react';
 
 import * as blazeFace from '@tensorflow-models/blazeface';
+// import * as tf from '@tensorflow/tfjs';
 import Webcam from 'react-webcam';
 
 import { Container, FaceBox } from './styles';
@@ -24,10 +25,11 @@ const Camera: FC = () => {
       toMatchItem.test(navigator.userAgent)
     );
 
+    console.log(window.innerWidth);
     return isMobile
       ? {
-          width: 539,
-          height: 720,
+          width: window.innerWidth,
+          height: window.innerHeight,
         }
       : {
           width: 720,
@@ -48,16 +50,22 @@ const Camera: FC = () => {
       const bottom = Math.round(face.bottomRight[0]);
       const right = Math.round(face.bottomRight[1]);
 
-      // const probability = face.probability[0].toFixed(2);
+      // const probability = face.probability[0];
 
       const width = right - left;
       const height = bottom - top;
 
       context.beginPath();
-      context.strokeStyle = 'green';
+      context.strokeStyle = '#30D158';
       context.lineWidth = 3;
-      context.rect(top, left, width, height * 0.9);
+      context.rect(top * 1.05, left * 0.9, width, height);
       context.stroke();
+
+      // const prob = (probability * 100).toPrecision(5).toString();
+      // const text = prob + '%';
+      // context.fillStyle = 'red';
+      // context.font = '13px sans-serif';
+      // context.fillText(text, top + 5, left + 20);
     });
   };
 
@@ -82,9 +90,10 @@ const Camera: FC = () => {
     const model = await blazeFace.load();
 
     setInterval(async () => {
+      // console.log(tf.memory());
       context?.clearRect(0, 0, canvas.width, canvas.height);
       await faceDetect(model, video, canvas, context);
-    }, 100);
+    }, 200);
   };
 
   return (
