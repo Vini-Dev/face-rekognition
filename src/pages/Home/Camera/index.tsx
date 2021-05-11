@@ -29,7 +29,7 @@ const Camera: FC = () => {
     return isMobile
       ? {
           width: window.innerWidth,
-          height: window.innerHeight,
+          height: window.innerHeight - 60,
         }
       : {
           width: 720,

@@ -1,7 +1,6 @@
 import { FC } from 'react';
 
-import Camera from 'src/components/Camera';
-
+import Camera from './Camera';
 import { Container } from './styles';
 
 const Home: FC = () => (
